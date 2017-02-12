@@ -1,4 +1,4 @@
-# CSCE 438 - HW2: An Improved Chat Room Service
+# CSCE 438 - [HW2](https://tamu.blackboard.com/bbcswebdav/pid-3067282-dt-content-rid-21408663_1/courses/CSCE.438.1711.M1/hw2.pdf): An Improved Chat Room Service
 ###Vincent Velarde, Kyle Rowland
 February 2017
 
