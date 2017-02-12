@@ -4,7 +4,7 @@ February 2017
 
 ###Files: [fb.proto](https://github.com/vinvelarde/CSCE438-HW2/blob/master/fb.proto), [fbc.cpp](https://github.com/vinvelarde/CSCE438-HW2/blob/master/fbc.cpp), [fbsd.cpp](https://github.com/vinvelarde/CSCE438-HW2/blob/master/fbsd.cpp), [Makefile](https://github.com/vinvelarde/CSCE438-HW2/blob/master/Makefile)
 
-###NOTES:
+###Notes:
   - This project roughly mimicks the functionality of Twitter
   - See comment block at the head of each source file for additional information
   
