@@ -7,7 +7,6 @@
 // February 2017
 //
 // NOTES:
-// 	-Program roughly mimicks twitter functionality.
 // 	-Expands upon previous homework in functionality and by
 // 		introducing RPCs and Protocol Buffers
 //
