@@ -12,6 +12,9 @@
 //
 //	-Project roughly mimicks the functionality of Twitter
 //
+//	-Might need another RPC for retreiving the last 20
+//		messages when switching to chat mode
+//
 //-------------------------------------------------------------
 
 syntax = "proto3";
