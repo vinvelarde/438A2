@@ -119,6 +119,49 @@ class TweeterClient {
 		std::unique_ptr<Tweeter::Stub> stub_;
 };
 
+//the client runs this loop while it's in command mode
+void cmdLoop(std::string user, TweeterClient* tweeter) {
+	std::string input, reply;
+	
+	//loop infinitely (unless break command is executed)
+	while(true) {
+		//get user input
+		std::cout << "cmd> ";
+		getline(std::cin, input);
+		
+		//handle commands from user input
+		if(input == "LIST") {	//needs to print out list of users (mark followed users with '*' maybe?)
+			reply = tweeter->List(user);
+			std::cout << "List RPC response: " << reply << std::endl;
+		}
+		else if(input == "JOIN") {	//needs to take additional input (username to join)
+			reply = tweeter->Following(user, user, false);
+			std::cout << "Following RPC response: " << reply << std::endl;
+		}
+		else if(input == "LEAVE") {	//needs to take additional input (username to leave)
+			reply = tweeter->Following(user, user, false);
+			std::cout << "Following RPC response: " << reply << std::endl;
+		}
+		else if(input == "CHAT") break;	//break cmdLoop and move to chatLoop
+		else std::cout << "Invalid Input" << std::endl;
+	}
+}
+
+//the client runs this loop while it's in chat mode
+void chatLoop(std::string user, TweeterClient* tweeter) {
+	std::string input, reply;
+	
+	//loop infinitely
+	while(true) {
+		//get user input
+		std::cout << "chat> ";
+		getline(std::cin, input);
+		
+		reply = tweeter->Msg(user);	//needs to take additional input (chat message)
+		std::cout << "Msg RPC response: " << reply << std::endl;
+	}
+}
+
 int main(int argc, char** argv) {
 	//user must provide host name and port number as command line arguments
 	if(argc < 4) {
@@ -135,27 +178,12 @@ int main(int argc, char** argv) {
 	TweeterClient tweeter(grpc::CreateChannel(
       server_address, grpc::InsecureChannelCredentials()));
 	std::string user(argv[3]);
-	
-	//test that each RPC is working
-	//-------------	List ------------------
-	std::string reply = tweeter.Msg(user);
-	std::cout << "List RPC response: " << reply << std::endl;
-	
-	//-------------	Following -------------
-	reply = tweeter.Msg(user);
-	std::cout << "Following RPC response: " << reply << std::endl;
-	
-	//-------------	Msg -------------------
-	reply = tweeter.Msg(user);
-	std::cout << "Msg RPC response: " << reply << std::endl;
+
+	cmdLoop(user, &tweeter);
+	chatLoop(user, &tweeter);
 	
 	return 0;
 }
-
-
-
-
-
 
 
 
