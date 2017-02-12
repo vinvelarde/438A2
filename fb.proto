@@ -1,0 +1,66 @@
+//-------------------------------------------------------------
+// CSCE 438: Distributed objects programming
+// HW2: An Improved Chat Room Service
+// 
+// Proto file
+// Vincent Velarde, Kyle Rowland
+// February 2017
+//
+// NOTES:
+// 	-Program roughly mimicks twitter functionality.
+// 	-Expands upon previous homework in functionality and by
+// 		introducing RPCs and Protocol Buffers
+//
+//	-Project roughly mimicks the functionality of Twitter
+//
+//-------------------------------------------------------------
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "CSCE468.HW.improvedChat";
+option java_outer_classname = "FBProto";
+option objc_class_prefix = "FB";
+
+package HW2;
+
+service Tweeter {
+	//called when client issues "LIST" command
+	//	takes current username and returns list of all users
+	//	indicates which users the current user is following
+	rpc List (User) returns (stream User) {}
+	
+	//called when client issues "JOIN" or "LEAVE" command
+	//	takes current username, username of another user, and boolean indicating
+	//		whether to follow or unfollow that user (true = follow, false = unfollow)
+	//	returns confirmation message
+	rpc Following (Action) returns (SendMsg) {}
+	
+	//called when a client in chat mode sends a message
+	//	takes current username, computes time and date of message at server,
+	//		writes that message to follower files and sends the message to
+	//		any currently logged in followers
+	//	returns confirmation message
+	rpc Msg (SendMsg) returns (SendMsg) {}
+}
+	
+//contains username and an optional boolean used in the LIST function
+message User {
+	string username = 1;
+	bool following = 2;
+}
+
+//contains current username, username of a user to follow or unfollow
+//	and a boolean indicating to follow or unfollow that user
+message Action {
+	string currentuser = 1;
+	string username = 2;
+	bool act = 3;
+}
+
+//contains message and senders username
+message SendMsg {
+	string sender = 1;
+	string message = 2;
+}
+
