@@ -12,9 +12,6 @@
 //
 //	-Project roughly mimicks the functionality of Twitter
 //
-//	-Might need another RPC for retreiving the last 20
-//		messages when switching to chat mode
-//
 //-------------------------------------------------------------
 
 syntax = "proto3";
@@ -27,6 +24,10 @@ option objc_class_prefix = "FB";
 package HW2;
 
 service Tweeter {
+	//called when client joins server
+	//	takes current username and returns welcome message
+	rpc Welcome (User) returns (SendMsg) {}
+
 	//called when client issues "LIST" command
 	//	takes current username and returns list of all users
 	//	indicates which users the current user is following
@@ -45,11 +46,18 @@ service Tweeter {
 	//	returns confirmation message
 	rpc Msg (SendMsg) returns (SendMsg) {}
 }
-	
+
+//used to store a list of all users
+message UserBase {
+	repeated User user = 1;
+}
+
 //contains username and an optional boolean used in the LIST function
 message User {
 	string username = 1;
-	bool following = 2;
+	repeated string followers = 2;
+	bool following = 3;
+	repeated SendMsg userlog = 4;
 }
 
 //contains current username, username of a user to follow or unfollow
@@ -63,6 +71,7 @@ message Action {
 //contains message and senders username
 message SendMsg {
 	string sender = 1;
-	string message = 2;
+	string timestamp = 2;
+	string message = 3;
 }
 
