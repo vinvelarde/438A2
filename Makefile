@@ -45,4 +45,4 @@ server: fb.pb.o fb.grpc.pb.o fbsd.o
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
 
 clean:
-	rm -f *.o *.pb.cc *.pb.h client server
+	rm -f *.o *.pb.cc *.pb.h client server UserList.txt
