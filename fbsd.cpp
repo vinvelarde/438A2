@@ -48,7 +48,7 @@ class masterServer final : public Tweeter::Service {
 	//	adds client to user list if they aren't already there
 	//	creates client file if one doesn't already exist
 	Status Welcome(ServerContext* context, const HW2::User* user,
-					SendMsg* welcome) {
+					SendMsg* welcome) override {
 		//first, check if user already exists
 		User u;
 		welcome->set_sender("SERVER: ");
@@ -72,6 +72,30 @@ class masterServer final : public Tweeter::Service {
 		
 		welcome->set_message("Welcome to the Server!");
 		
+		return Status::OK;
+	}
+	
+	//Chat RPC
+	//gets past 20 messages from users log
+	//	called when a client switches to chat mode
+	Status Chat(ServerContext* context, const HW2::User* user,
+				ServerWriter<SendMsg>* writer) override {
+		User u;
+		SendMsg msg;
+		//find current user in userList
+		for(int i=0; i<userList.user_size(); i++) {
+			u = userList.user(i);
+			if(u.username() == user->username()) {
+				//send the latest 20 message
+				int start = 0;
+				if(u.userlog_size() > 20) start = u.userlog_size() - 20;
+				for(int j=start; j<u.userlog_size(); j++) {
+					msg = u.userlog(j);
+					writer->Write(msg);
+				}
+				break;
+			}
+		}
 		return Status::OK;
 	}
 	
@@ -142,7 +166,6 @@ class masterServer final : public Tweeter::Service {
 	}
 	
 	//Used for sending client or server messages
-	//UNDER CONSTRUCTION
 	Status Msg(ServerContext* context, const SendMsg* msg,
 				SendMsg* confirm) override {
 		system_clock::time_point today = system_clock::now();
@@ -154,23 +177,24 @@ class masterServer final : public Tweeter::Service {
 		//iterate through userList and find sender
 		for(int i=0; i<userList.user_size(); i++) {
 			u = userList.mutable_user(i);
-			if(u->username() == msg->sender()) {
-				//make list of followers
-				for(int j=0; j<u->followers_size(); j++) {
-					followers.push_back(u->username());
+			if(u->username() == msg->sender()) {	//find the current user
+				for(int j=0; j<u->followers_size(); j++) {	//add current user's followers to a vector
+					followers.push_back(u->followers(j));
 				}
 				break;
 			}
 		}
-		//iterate through and find followers
-		for(int i=0; i<userList.user_size(); i++) {
+		
+		//now that we have the names of all the followers we need to update their logs
+		SendMsg* m;
+		for(int i=0; i<userList.user_size(); i++) {	//iterate through userList
 			u = userList.mutable_user(i);
-			for(int j=0; j<followers.size(); j++) {
-				if(u->username() == followers[j]) {
-					SendMsg* message = u->add_userlog();
-					message->set_sender(msg->sender());
-					message->set_timestamp(ctime(&tt));
-					message->set_message(msg->message());
+			for(int j=0; j<followers.size(); j++) {	//iterate through followers vector
+				if(u->username() == followers[j]) {	//find matching entries
+					m = u->add_userlog();	//update userlog with the message
+					m->set_sender(msg->sender());
+					m->set_timestamp(ctime(&tt));
+					m->set_message(msg->message());
 				}
 			}
 		}
@@ -183,6 +207,25 @@ class masterServer final : public Tweeter::Service {
 		
 		return Status::OK;
 	}
+	
+	//called to get latest messages
+	/*Status CheckMail(ServerContext* context, const User* user, 
+						ServerWriter<SendMsg>* writer) override {
+		User* u;
+		SendMsg msg;
+		for(int i=0; i<userList.user_size(); i++) {
+			u = userList.mutable_user(i);
+			if(u->username() == user->username()) {
+				for(int j=0; j<u->mailbox_size(); j++) {
+					msg = u->mailbox(j);
+					writer->Write(msg);
+				}
+				u->clear_mailbox();
+				break;
+			}
+		}
+		return Status::OK;
+	}*/
 	
 	public:
 		//read current user list from file at server start
@@ -253,3 +296,8 @@ int main(int argc, char** argv) {
 	
 	return 0;
 }
+
+
+
+
+
