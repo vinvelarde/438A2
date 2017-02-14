@@ -27,6 +27,10 @@ service Tweeter {
 	//called when client joins server
 	//	takes current username and returns welcome message
 	rpc Welcome (User) returns (SendMsg) {}
+	
+	//called when client switches to chat mode
+	//	takes current username and returns last 20 messages from their log
+	rpc Chat (User) returns (stream SendMsg) {}
 
 	//called when client issues "LIST" command
 	//	takes current username and returns list of all users
@@ -45,6 +49,11 @@ service Tweeter {
 	//		any currently logged in followers
 	//	returns confirmation message
 	rpc Msg (SendMsg) returns (SendMsg) {}
+	
+	//called to get latest messages
+	//	takes current username and returns contents of mailbox
+	//	empties mailbox after being called
+	rpc CheckMail (User) returns (stream SendMsg) {}
 }
 
 //used to store a list of all users
@@ -57,7 +66,8 @@ message User {
 	string username = 1;
 	repeated string followers = 2;
 	bool following = 3;
-	repeated SendMsg userlog = 4;
+	repeated SendMsg mail = 4;
+	repeated SendMsg userlog = 5;
 }
 
 //contains current username, username of a user to follow or unfollow
@@ -74,4 +84,6 @@ message SendMsg {
 	string timestamp = 2;
 	string message = 3;
 }
+
+
 
