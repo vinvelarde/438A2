@@ -12,8 +12,6 @@
 //
 //	-Project roughly mimicks functionality of Twitter
 //
-//	-This code is still UNDER CONSTRUCTION
-//
 //-------------------------------------------------------------
 
 #include <iostream>
@@ -208,25 +206,6 @@ class masterServer final : public Tweeter::Service {
 		return Status::OK;
 	}
 	
-	//called to get latest messages
-	/*Status CheckMail(ServerContext* context, const User* user, 
-						ServerWriter<SendMsg>* writer) override {
-		User* u;
-		SendMsg msg;
-		for(int i=0; i<userList.user_size(); i++) {
-			u = userList.mutable_user(i);
-			if(u->username() == user->username()) {
-				for(int j=0; j<u->mailbox_size(); j++) {
-					msg = u->mailbox(j);
-					writer->Write(msg);
-				}
-				u->clear_mailbox();
-				break;
-			}
-		}
-		return Status::OK;
-	}*/
-	
 	public:
 		//read current user list from file at server start
 		void getUserList() {
@@ -263,41 +242,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 	
-	//------------------------------------------------------
-	//THIS CODE WRITES A PROTO BUFFER MESSAGE TO A FILE
-	//------------------------------------------------------
-	std::filebuf fb;
-	fb.open("UserList.txt", std::ios::out);
-	std::ostream os(&fb);
-	UserBase userList;
-	User* user1 = userList.add_user();
-	user1->set_username("Vince");
-	user1->add_followers("Vince");
-	user1->add_followers("Vincent");
-	user1 = userList.add_user();
-	user1->set_username("Ruth");
-	user1->add_followers("Ruth");
-	user1 = userList.add_user();
-	user1->set_username("Sarah");
-	user1->add_followers("Sarah");
-	user1->add_followers("Vincent");
-	user1 = userList.add_user();
-	user1->set_username("Vincent");
-	user1->add_followers("Vincent");
-	user1 = userList.add_user();
-	user1->set_username("Joseph");
-	user1->add_followers("Joseph");
-	user1->add_followers("Ruth");
-	user1->add_followers("Sarah");
-	userList.SerializeToOstream(&os);
-	fb.close();
-	
 	runServer(argv[1]);
 	
 	return 0;
 }
-
-
-
-
-
