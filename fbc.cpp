@@ -12,8 +12,6 @@
 //
 //	-Project roughly mimicks functionality of Twitter
 //
-//	-This code is still UNDER CONSTRUCTION
-//
 //-------------------------------------------------------------
 
 #include <iostream>
@@ -138,22 +136,6 @@ class TweeterClient {
 		//Msg RPC
 		Status status = stub_->Msg(&context, msg, &reply);
 	}
-	
-	//used to get latest messages
-	/*void CheckMail(const std::string& u) {
-		User user;
-		user.set_username(u);
-		SendMsg msg;
-		ClientContext context;
-		
-		//loop through returning stream
-		std::unique_ptr<ClientReader<SendMsg> > reader(stub_->CheckMail(&context, user));
-		while(reader->Read(&msg)) {
-			//print messages
-			std::cout << msg.sender() << " : " << msg.timestamp() << msg.message() << std::endl;
-		}
-		Status status = reader->Finish();
-	}*/
 		
 	private:
 		std::unique_ptr<Tweeter::Stub> stub_;
@@ -195,13 +177,17 @@ void chatLoop(std::string user, TweeterClient* tweeter) {
 	std::string input, reply;
 	//loop infinitely
 	while(true) {
-		//tweeter->CheckMail(user);
 		//get user input
+		std::cout << "Type \":r\" to refresh\n";
 		std::cout << "chat> ";
 		getline(std::cin, input);
 		
-		tweeter->Msg(user, input);
-		//std::cout << "Msg RPC response: " << reply << std::endl;
+		if(input == ":r" || input == ":R") {
+			system("clear");
+			std::cout << "Type \":r\" to refresh\n";
+			tweeter->Chat(user);
+		}
+		else tweeter->Msg(user, input);
 	}
 }
 
@@ -230,8 +216,6 @@ int main(int argc, char** argv) {
 	
 	return 0;
 }
-
-
 
 
 
