@@ -49,11 +49,6 @@ service Tweeter {
 	//		any currently logged in followers
 	//	returns confirmation message
 	rpc Msg (SendMsg) returns (SendMsg) {}
-	
-	//called to get latest messages
-	//	takes current username and returns contents of mailbox
-	//	empties mailbox after being called
-	rpc CheckMail (User) returns (stream SendMsg) {}
 }
 
 //used to store a list of all users
@@ -84,6 +79,4 @@ message SendMsg {
 	string timestamp = 2;
 	string message = 3;
 }
-
-
 
