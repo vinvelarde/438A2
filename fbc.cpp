@@ -61,6 +61,23 @@ class TweeterClient {
 		}
 	}
 	
+	//called when switching into chat mode
+	//	prints the past 20 messages for the clients log
+	void Chat(const std::string& u) {
+		User user;
+		user.set_username(u);
+		SendMsg msg;
+		ClientContext context;
+		
+		//loop through returning stream
+		std::unique_ptr<ClientReader<SendMsg> > reader(stub_->Chat(&context, user));
+		while(reader->Read(&msg)) {
+			//print messages
+			std::cout << msg.sender() << " : " << msg.timestamp() << msg.message() << std::endl;
+		}
+		Status status = reader->Finish();
+	}
+	
 	//used for LIST command
 	//Sends the client a list of all users indicating which ones
 	//	the client is currently following
@@ -111,26 +128,32 @@ class TweeterClient {
 	}
 	
 	//used for sending client or server messages
-	//UNDER CONSTRUCTION
-	std::string Msg(const std::string& user) {
+	void Msg(const std::string& user, std::string& m) {
 		//set up RPC inputs
 		SendMsg msg, reply;
 		msg.set_sender(user);
+		msg.set_message(m);
 		ClientContext context;
 		
 		//Msg RPC
 		Status status = stub_->Msg(&context, msg, &reply);
-		
-		//do something with the return value
-		if(status.ok()) {
-			return reply.message();
-		}
-		else {
-			std::cout << status.error_code() << ": " << status.error_message()
-					<< std::endl;
-			return "RPC failed";
-		}
 	}
+	
+	//used to get latest messages
+	/*void CheckMail(const std::string& u) {
+		User user;
+		user.set_username(u);
+		SendMsg msg;
+		ClientContext context;
+		
+		//loop through returning stream
+		std::unique_ptr<ClientReader<SendMsg> > reader(stub_->CheckMail(&context, user));
+		while(reader->Read(&msg)) {
+			//print messages
+			std::cout << msg.sender() << " : " << msg.timestamp() << msg.message() << std::endl;
+		}
+		Status status = reader->Finish();
+	}*/
 		
 	private:
 		std::unique_ptr<Tweeter::Stub> stub_;
@@ -167,15 +190,17 @@ void cmdLoop(std::string user, TweeterClient* tweeter) {
 
 //the client runs this loop while it's in chat mode
 void chatLoop(std::string user, TweeterClient* tweeter) {
-	std::string input, reply;
+	tweeter->Chat(user);
 	
+	std::string input, reply;
 	//loop infinitely
 	while(true) {
+		//tweeter->CheckMail(user);
 		//get user input
 		std::cout << "chat> ";
 		getline(std::cin, input);
 		
-		reply = tweeter->Msg(user);	//needs to take additional input (chat message)
+		tweeter->Msg(user, input);
 		//std::cout << "Msg RPC response: " << reply << std::endl;
 	}
 }
@@ -205,11 +230,6 @@ int main(int argc, char** argv) {
 	
 	return 0;
 }
-
-
-
-
-
 
 
 
